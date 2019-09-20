@@ -2,7 +2,7 @@
 
 Easy way to convert any promise to suspended promise
 
-Demo:
+Demo: https://pie6k.github.io/suspensify/
 
 ```ts
 import React, { Suspense } from 'react';
