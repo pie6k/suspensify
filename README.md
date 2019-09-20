@@ -2,6 +2,10 @@
 
 Easy way to convert any promise to suspended promise
 
+```
+yarn add suspensify
+```
+
 Demo: https://pie6k.github.io/suspensify/
 
 ```ts
