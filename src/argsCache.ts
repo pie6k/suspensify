@@ -1,18 +1,13 @@
 export function createArgsCache<A extends any[], V>(
   valueGetter: (...args: A) => V,
 ) {
-  let noArgsCache: V | undefined;
+  const noArgsSymbol = Symbol('no-args');
 
   const nestedCacheMap = new Map<any, any>();
 
-  function getOrSetCacheForArgs(args: A, setValue?: V) {
+  function getOrSetCacheForArgs(args: A, setValue?: V): V {
     if (args.length === 0) {
-      if (noArgsCache !== undefined) {
-        return noArgsCache;
-      }
-      const argsValue = valueGetter(...args);
-      noArgsCache = argsValue;
-      return argsValue;
+      return getOrSetCacheForArgs(([noArgsSymbol] as any) as A, setValue);
     }
 
     const argsValue: V = args.reduce(
@@ -52,7 +47,7 @@ export function createArgsCache<A extends any[], V>(
   }
 
   function setCacheForArgs(args: A, value: V) {
-    return getOrSetCacheForArgs(args, value);
+    getOrSetCacheForArgs(args, value);
   }
 
   return [getCacheForArgs, setCacheForArgs] as const;
