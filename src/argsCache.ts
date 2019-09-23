@@ -5,50 +5,77 @@ export function createArgsCache<A extends any[], V>(
 
   const nestedCacheMap = new Map<any, any>();
 
-  function getOrSetCacheForArgs(args: A, setValue?: V): V {
+  function getArgsParentMap(args: A) {
     if (args.length === 0) {
-      return getOrSetCacheForArgs(([noArgsSymbol] as any) as A, setValue);
+      return nestedCacheMap;
     }
 
-    const argsValue: V = args.reduce(
+    const lastArgumentParentMap: Map<any, any> = args.reduce(
       (currentArgMap: Map<any, any>, currentArgument, index) => {
         const hasMoreArgs = index < args.length - 1;
 
+        if (!hasMoreArgs) {
+          return currentArgMap;
+        }
+
         if (currentArgMap.has(currentArgument)) {
-          if (!hasMoreArgs && setValue) {
-            currentArgMap.set(currentArgument, setValue);
-            return setValue;
-          }
           return currentArgMap.get(currentArgument);
         }
 
-        if (hasMoreArgs) {
-          const nextArgMap = new Map<any, any>();
-          currentArgMap.set(currentArgument, nextArgMap);
+        const nextArgMap = new Map<any, any>();
+        currentArgMap.set(currentArgument, nextArgMap);
 
-          return nextArgMap;
-        }
-
-        const valueToSave =
-          setValue !== undefined ? setValue : valueGetter(...args);
-
-        currentArgMap.set(currentArgument, valueToSave);
-
-        return valueToSave;
+        return nextArgMap;
       },
       nestedCacheMap,
     );
 
-    return argsValue;
+    return lastArgumentParentMap;
   }
 
-  function getCacheForArgs(args: A) {
-    return getOrSetCacheForArgs(args);
+  function getLastArgumentFromArgs(args: A) {
+    if (args.length === 0) {
+      return noArgsSymbol;
+    }
+
+    return args[args.length - 1];
+  }
+
+  function getCacheForArgs(args: A): V {
+    const argsParentMap = getArgsParentMap(args);
+
+    const lastArgument = getLastArgumentFromArgs(args);
+
+    if (argsParentMap.has(lastArgument)) {
+      return argsParentMap.get(lastArgument);
+    }
+
+    const value = valueGetter(...args);
+
+    argsParentMap.set(lastArgument, value);
+
+    return value;
   }
 
   function setCacheForArgs(args: A, value: V) {
-    getOrSetCacheForArgs(args, value);
+    const argsParentMap = getArgsParentMap(args);
+
+    const lastArgument = getLastArgumentFromArgs(args);
+
+    argsParentMap.set(lastArgument, value);
   }
 
-  return [getCacheForArgs, setCacheForArgs] as const;
+  function clearCacheForArgs(args: A) {
+    const argsParentMap = getArgsParentMap(args);
+
+    const lastArgument = getLastArgumentFromArgs(args);
+
+    argsParentMap.delete(lastArgument);
+  }
+
+  return {
+    get: getCacheForArgs,
+    set: setCacheForArgs,
+    clear: clearCacheForArgs,
+  };
 }

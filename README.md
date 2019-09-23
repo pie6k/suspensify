@@ -24,7 +24,7 @@ function getHelloWithDelay(name: string, delay: number) {
 }
 
 // now we convert it to suspended function
-const suspendedHello = suspensify(getHelloWithDelay);
+const [getSuspendedHello] = suspensify(getHelloWithDelay);
 
 // now we can just use it inside any component like it is sync function
 
@@ -35,7 +35,7 @@ interface DelayedHelloProps {
 }
 
 function DelayedHello({ delay, name }: DelayedHelloProps) {
-  const helloString = suspendedHello(name, delay);
+  const helloString = getSuspendedHello(name, delay);
   return <div>{helloString}</div>;
 }
 

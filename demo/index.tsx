@@ -17,16 +17,18 @@ interface DelayedHelloProps {
   name: string;
 }
 
-const getDelayedHello = suspensify((name: string, delay: number) => {
-  return new Promise<string>((resolve) => {
-    setTimeout(() => {
-      resolve(`Hello, ${name}`);
-    }, delay);
-  });
-});
+const [getSuspendedHello, { clearCacheForArgs }] = suspensify(
+  (name: string, delay: number) => {
+    return new Promise<string>((resolve, reject) => {
+      setTimeout(() => {
+        resolve(`Hello, ${name}`);
+      }, delay);
+    });
+  },
+);
 
 function DelayedHello({ delay, name }: DelayedHelloProps) {
-  const hello = getDelayedHello(name, delay);
+  const hello = getSuspendedHello(name, delay);
   return <div>{hello}</div>;
 }
 
