@@ -1,6 +1,6 @@
 # Suspensify
 
-Easy way to convert any promise to suspended promise
+Easy way to convert any async function to suspended function
 
 ```
 yarn add suspensify
