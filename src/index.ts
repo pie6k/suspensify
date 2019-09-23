@@ -41,9 +41,10 @@ export function suspensify<T, A extends any[]>(
     return valueOrValuePromise;
   }
 
-  const clearCacheForArgs = argsCache.clear;
+  const removeCacheForArgs = argsCache.remove;
+  const clearCache = argsCache.clear;
 
-  return [getSuspended, { clearCacheForArgs }] as const;
+  return [getSuspended, { removeCacheForArgs, clearCache }] as const;
 }
 
 export default suspensify;

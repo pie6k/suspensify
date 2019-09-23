@@ -73,9 +73,14 @@ export function createArgsCache<A extends any[], V>(
     argsParentMap.delete(lastArgument);
   }
 
+  function clearCache() {
+    nestedCacheMap.clear();
+  }
+
   return {
     get: getCacheForArgs,
     set: setCacheForArgs,
-    clear: clearCacheForArgs,
+    remove: clearCacheForArgs,
+    clear: clearCache,
   };
 }

@@ -17,7 +17,7 @@ interface DelayedHelloProps {
   name: string;
 }
 
-const [getSuspendedHello, { clearCacheForArgs }] = suspensify(
+const [getSuspendedHello, { removeCacheForArgs }] = suspensify(
   (name: string, delay: number) => {
     return new Promise<string>((resolve, reject) => {
       setTimeout(() => {
